@@ -427,7 +427,7 @@ function resetpass(req, res){
                         from : 'munjal.chirag.test@gmail.com',
                         to : email,
                         subject : 'register',
-                        html :'<p>Click <a href = "http://localhost:3000/recover/'+token+'">clickhear</a>to reset your password </p>'
+                        html :'<p>Click <a href = "https://sdirect-chandra.herokuapp.com/recover/'+token+'">clickhear</a>to reset your password </p>'
 
                     }
                     transporter.sendMail(mailOptions,function(err,info){
