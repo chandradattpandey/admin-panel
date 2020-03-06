@@ -2,7 +2,8 @@ const userSchema = require('../model/user');
 const generator = require('generate-password');
 const nodemailer = require("nodemailer");
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
+var path = require('path');
+const formidable = require('formidable');
 SALT_WORK_FACTOR = 10;
 
 module.exports = {
@@ -27,7 +28,7 @@ module.exports = {
     subadminchange,
     subadminpass,
     adminchangepass,
-    resetpass,saveresetpass,submitresetpass
+    resetpass,saveresetpass,submitresetpass,uploadpage,imgupload
 }
 
 
@@ -172,7 +173,7 @@ var transporter = nodemailer.createTransport({
     }
 });
 
-console.log('created');
+// console.log('created');
 
 function sendmail(email, password) {
     let mailOptions = {
@@ -515,3 +516,23 @@ function submitresetpass(req,res){
 
 
 
+function uploadpage (req, res){
+    res.render( 'uploadimg.html');
+};
+
+function imgupload(req, res){
+    var form = new formidable.IncomingForm();
+
+    form.parse(req);
+
+    form.on('fileBegin', function (name, file){
+        file.path = path.join(__dirname, '../public/img/') + file.name;
+        console.log(path.join(__dirname, '../public/img/'));
+    });
+
+    form.on('file', function (name, file){
+        console.log('Uploaded ' + file.name);
+    });
+
+    res.render('index.html');
+};

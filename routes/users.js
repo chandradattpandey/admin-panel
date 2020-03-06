@@ -25,4 +25,6 @@ router.get('/subchange/:id',auth.aut,auth.checkauth,common_controller.subadminch
 router.post('/subadminpass',auth.aut,auth.checkauth,common_controller.subadminpass);
 router.get('/recover/:id',common_controller.saveresetpass);
 router.post('/submitresetpass',common_controller.submitresetpass);
+router.get('/uploadpage',common_controller.uploadpage);
+router.post('/uploadimg',common_controller.imgupload)
 module.exports = router;
