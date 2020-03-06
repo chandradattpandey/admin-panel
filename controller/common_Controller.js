@@ -21,7 +21,13 @@ module.exports = {
     modify_save,
     forgotpass,
     forgot,
-    forgotpage
+    forgotpage,
+    logout,
+    changepass,
+    subadminchange,
+    subadminpass,
+    adminchangepass,
+    resetpass,saveresetpass,submitresetpass
 }
 
 
@@ -73,7 +79,7 @@ function adminLogin(req, res) {
                         console.log(err);
                     } else {
                         console.log('Password', isMatch);
-                        if (isMatch == 'false') {
+                        if (!isMatch) {
                             res.render('login.html');
                         } else {
                             let token = tokenGenerate(data.id, data.role);
@@ -168,12 +174,12 @@ var transporter = nodemailer.createTransport({
 
 console.log('created');
 
-function sendmail(email, password, req, res) {
+function sendmail(email, password) {
     let mailOptions = {
         from: 'munjal.chirag.test@gmail.com',
         to: email,
         subject: 'register',
-        html: 'thanku for your registration !!' + email + 'password  :'+ password
+        html: 'thanku for your registration !!' + email + 'password  :' + password
     };
     transporter.sendMail(mailOptions, function (error, info) {
 
@@ -223,7 +229,12 @@ function deletedata(req, res) {
 
         }
         else {
-            res.redirect('/viewsubAdmin');
+            let role = data.role;
+            if (role == 'subadmin') {
+                res.redirect('/viewsubAdmin');
+            } else {
+                res.redirect('/viewuser')
+            }
         }
     })
 }
@@ -255,54 +266,252 @@ function modify_save(req, res) {
         if (err) {
             console.log(err);
         } else {
-            res.redirect('/viewsubAdmin');
+
+            let role = data.role;
+            if (role == 'subadmin') {
+                res.redirect('/viewsubAdmin');
+            } else {
+                res.redirect('/viewuser');
+            }
         }
     })
 }
 
-function forgotpage(req,res){
+function forgotpage(req, res) {
     res.render('forgot.html');
 }
-
-function forgotpass(req,res){
-    let email = req.body.email;
-    console.log(email);
-    let newpass = req.newpass;
-    console.log(newpass);
-    let pass = req.pass;
-    console.log(pass);
-    userSchema.findOneAndUpdate({'email':email }, { $set: { 'password': newpass} },(err)=>{
-        if(err){
-            console.log(err);
-        }else{
-            sendmail(email,pass)
-            res.render('login.html');
-        }
-    })
-}
-
-
-
-
-
-
 
 function forgot(req, res, next) {
     let password = generator.generate({
         length: 10
     })
-    console.log(password);
-    bcrypt.genSalt(SALT_WORK_FACTOR, function (err, salt) {
-        if (err) return next(err);
-
-
-        bcrypt.hash(password, salt, function (err, hash) {
-            if (err) return next(err);
-            newpass = hash;
-            req.newpass =newpass;
-            
             req.pass = password;
             next()
-        })
+}
+function forgotpass(req, res) {
+    let email = req.body.email;
+    let newpass = req.pass;
+    console.log(email);
+    userSchema.findOne({ 'email': email }, (err,result) => {
+        console.log(result);
+        let role = result.role;
+        console.log(role);
+        if (err) {
+            console.log(err);
+        }
+         else if(role == 'admin' || role =='user') {
+             result.password=newpass;
+             sendmail(email, newpass);
+             result.save((err)=>{
+                 if(err){
+                     console.log(err);
+                 }
+                 else{
+                    
+                    res.render('login.html');
+                 }
+             })
+        }else{
+            res.render('auth.html');
+        }
     })
 }
+
+
+
+
+
+
+
+
+
+function logout(req, res) {
+    res.clearCookie('name').redirect('/');
+}
+
+
+
+
+function changepass(req, res) {
+    res.render('adminchangepass.html');
+}
+
+
+function adminchangepass(req, res) {
+    
+    let email = req.body.email;
+    console.log(email);
+    let oldpass = req.body.oldpass;
+    console.log(oldpass);
+    let cryppass = req.hashpass;
+    console.log(cryppass);
+    let newpass = req.body.newpass;
+    console.log(newpass);
+
+    userSchema.findOne({'email':email},function(err,result){
+        if(err){
+            console.log(err)
+        }
+        else{
+            result.comparePassword(oldpass,function(err,isMatch){
+                if(err){
+                    console.log(err)
+                }
+               else if(isMatch){
+                    result.password=newpass;
+                    result.save(function(err){
+                        if(err){
+                            console.log(err)
+                        }
+                        else{
+                            res.redirect('/')
+                        }
+                    })
+                }
+                else{
+                    res.json("Wrong Old Password")
+                }
+            })
+        }
+    })
+}
+
+function subadminchange(req, res,) {
+    let id=req.params.id;
+    res.render('subadminpass.html',{id})
+}
+
+
+
+function subadminpass(req,res){
+    let id = req.body.id;
+    let pass = req.body.newpass;
+    console.log("find",id,pass)
+    userSchema.findOne({'_id':id},(err,data)=>{
+        if(err){
+            console.log(err);
+        }else {
+            data.password=pass;
+            data.save(function(err){
+                if(err){
+                    console.log(err);
+                }else{
+                    res.redirect('/')
+                }
+            })
+        }
+    })
+}
+
+function resetpass(req, res){
+    let email = req.body.email;
+    console.log(email);
+
+    userSchema.findOne({'email':email},(err,result)=>{
+        if(err){
+            console.log(err);
+        }
+        else if(result == null){
+            res.json("please enter register email");
+
+        }
+        else if(result.role == 'subadmin'){
+            res.json('request admin to change the password');
+        }else{
+            let id= result.id;
+            let role="resetpass";
+            jwt.sign({ 'id': id, 'role': role }, "chandra", { expiresIn: '60m' },function(err,token){
+                if(err){}
+                else{
+                    var mailOptions={
+                        from : 'munjal.chirag.test@gmail.com',
+                        to : email,
+                        subject : 'register',
+                        html :'<p>Click <a href = "http://localhost:3000/recover/'+token+'">clickhear</a>to reset your password </p>'
+
+                    }
+                    transporter.sendMail(mailOptions,function(err,info){
+                            if(err){
+                                res.json("Internal Error")
+                            }
+                            else{
+                                result.resetCheck=token;
+                                result.save((err)=>{
+                                    if(err){
+                                        res.json("Error")
+                                    }
+                                    else{
+                                        res.redirect('/');
+                                    }
+                                })
+                            }
+                    })
+                }
+            });
+            
+        }
+    })
+}
+
+
+
+
+
+
+function saveresetpass(req,res){
+    let token=req.params.id;
+    jwt.verify(token,"chandra",(err,decode)=>{
+        if(err){
+            res.json("Invalid Token");
+        }
+        else{
+            let id =decode.id;
+            let role=decode.role;
+            
+            if(role == 'resetpass'){
+                    
+                    userSchema.findOne({'_id':id,'resetCheck':token},(err,data)=>{
+                        if(err){
+                            res.json("Error")
+                        }
+                        else if(data == null){
+                            res.redirect('/')
+
+                        }
+                        else{
+                            let email=data.email;
+                            res.render('resetpass.html',{id,email,token});
+                        }
+
+                    })
+            }
+            else{
+                res.json("Invalid")
+            }
+        }
+    })
+}
+
+
+function submitresetpass(req,res){
+    let id=req.body.id;
+    let pass=req.body.password;
+    let token=req.body.token;
+    userSchema.findOne({'_id':id},function(err,user){
+        if(err){}
+        else if(user == null){}
+        else{
+            user.password=pass;
+            user.resetLink=undefined;
+            user.save((err)=>{
+                if(err){}
+                else{
+                    res.redirect('/');
+                }
+            })
+        }
+    })
+}
+
+
+

@@ -60,14 +60,14 @@
       <li class="nav-item">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true"
           aria-controls="collapseTwo">
-          <i class="fas fa-user-plus"></i>
+          <i class="fas fa-user-plus mr-2  text-gray-400"></i>
           <span>ADD</span>
         </a>
         <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
           <div class="bg-white py-2 collapse-inner rounded">
             <h6 class="collapse-header">Custom Components:</h6>
-            <a class="collapse-item" href="http://localhost:3000/subAdmin">SubAdmin</a>
-            <a class="collapse-item" href="http://localhost:3000/newuser">User</a>
+            <a class="collapse-item" href="/subAdmin">SubAdmin</a>
+            <a class="collapse-item" href="/newuser">User</a>
           </div>
         </div>
       </li>
@@ -76,21 +76,44 @@
       <li class="nav-item">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities"
           aria-expanded="true" aria-controls="collapseUtilities">
-          <i class="fas fa-eye"></i>
+          <i class="fas fa-eye text-gray-400 mr-2 "></i>
           <span>VIEW</span>
         </a>
         <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
           <div class="bg-white py-2 collapse-inner rounded">
             <h6 class="collapse-header">Custom Utilities:</h6>
-            <a class="collapse-item" href="http://localhost:3000/viewsubAdmin">view subAdmin</a>
-            <a class="collapse-item" href="http://localhost:3000/viewuser">view user</a>
-
+            <a class="collapse-item" href="/viewsubAdmin">view subAdmin</a>
+            <a class="collapse-item" href="/viewuser">view user</a>
           </div>
         </div>
       </li>
 
 
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse" aria-expanded="true"
+          aria-controls="collapse">
+          <i class="fas fa-unlock-alt mr-2 text-gray-400"></i>
+          <span>Change Password</span>
+        </a>
+        <div id="collapse" class="collapse" aria-labelledby="heading" data-parent="#accordionSidebar">
+          <div class="bg-white py-2 collapse-inner rounded">
+            <h6 class="collapse-header">Custom Components:</h6>
+            <a class="collapse-item" href="/adminchangepass">Admin</a>
+          </div>
+        </div>
+      </li>
 
+
+      <li class="nav-item">
+        <div>
+          <a class="nav-link collapsed" href="/logout" aria-expanded="true"
+            aria-controls="collapseUtilities">
+            <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+            <span>Logout</span>
+          </a>
+        </div>
+      </li>
+      
 
       <hr class="sidebar-divider d-none d-md-block">
 
@@ -141,8 +164,9 @@
             <li class="nav-item dropdown no-arrow">
               <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown"
                 aria-haspopup="true" aria-expanded="false">
-                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Valerie Luna</span>
-                <img class="img-profile rounded-circle" src="https://source.unsplash.com/QAB-WJcbgJk/60x60">
+                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Chandra Datt</span>
+                <img class="img-profile rounded-circle"
+                  src="https://cdn3.vectorstock.com/i/1000x1000/92/82/businessman-avatar-man-in-suit-with-blue-tie-vector-13569282.jpg/60x60">
               </a>
 
               <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
@@ -159,7 +183,8 @@
                   Activity Log
                 </a>
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+                <a class="dropdown-item" href="/logout" data-toggle="modal"
+                  data-target="#logoutModal">
                   <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                   Logout
                 </a>

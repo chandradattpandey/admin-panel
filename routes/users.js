@@ -16,6 +16,13 @@ router.get('/delete/:id',auth.aut,auth.checkauth,common_controller.deletedata);
 router.get('/modify/:id',auth.aut,auth.checkauth,common_controller.modify);
 router.post('/modify_save',auth.aut,common_controller.modify_save);
 router.get('/forgotpage',common_controller.forgotpage);
-router.post('/forgot',common_controller.forgot,common_controller.forgotpass);
-
+router.post('/resetpass',common_controller.resetpass);
+router.get('/logout',common_controller.logout);
+router.get('/adminchangepass',auth.aut,auth.checkauth,common_controller.changepass);
+// router.post('/subadminpass/:id',common_controller.subadminpass);
+router.post('/adminchange',auth.aut,auth.checkauth,common_controller.adminchangepass);
+router.get('/subchange/:id',auth.aut,auth.checkauth,common_controller.subadminchange);
+router.post('/subadminpass',auth.aut,auth.checkauth,common_controller.subadminpass);
+router.get('/recover/:id',common_controller.saveresetpass);
+router.post('/submitresetpass',common_controller.submitresetpass);
 module.exports = router;

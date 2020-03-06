@@ -17,9 +17,9 @@
 
 <body class="container mt-5">
     <div>
-   
+
         <!-- <a class="btn btn-success" href="http://localhost:6090/add">Add</a> -->
- 
+
         <table class="table mt-4">
             <thead class="thead-dark">
                 <tr>
@@ -61,10 +61,12 @@
                     <th>
                         <% for (var i =0; i<juser.length ;  i++ ) { %>
                         <br />
-                        <a style="color:green" href="http://localhost:3000/modify/<%=juser[i]['_id'] %>" name="name">Modify</a>
+                        <a style="color:green" href="http://localhost:3000/modify/<%=juser[i]['_id'] %>"
+                            name="name">Modify</a>
                         <a class="ml-3" style="color: red" href="http://localhost:3000/delete/<%=juser[i]['_id'] %>"
                             name="id">Delete </a>
-
+                        <a class="ml-3" style="color: red" href="http://localhost:3000/subchange/<%=juser[i]['_id'] %>"
+                            name="id">Change Password </a>
                         <% } %>
 
                     </th>

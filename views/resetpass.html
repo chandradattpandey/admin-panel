@@ -12,13 +12,22 @@
   </head>
   <body>
     <div class="container mt-5">
-    <form action="/resetpass" method="POST">
+    <form action="/submitresetpass" method="POST">
         <div class="form-group">
-          <label>Email address</label>
-          <input type="email" name="email" class="form-control" placeholder="Enter Email">
+          
+          <input type="hidden" name="email" value="<%=email%>"  class="form-control" placeholder="Enter Email">
+            
+            
+          <input type="hidden" name="id" value="<%=id%>" class="form-control" placeholder="EnterId">
+            
+           
+          <input type="hidden" name="token" value="<%=token%>" class="form-control" placeholder="Enter Token">
+            
+            <label>New Password</label>
+          <input type="password" name="password" class="form-control" placeholder="Enter New Password">
             </div>
        
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="submit" class="btn btn-primary">Reset Password</button>
       </form>
     </div>
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>

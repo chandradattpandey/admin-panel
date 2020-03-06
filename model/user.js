@@ -9,9 +9,10 @@ const UserSchema = new Schema({
     password : String,
     role:{type:String,
             enum:['admin','subadmin','user']
-        
+           
         },
-    is_deleted:{type:Boolean,default:false}        
+    is_deleted:{type:Boolean,default:false},
+    resetCheck:String    
 });
 
 UserSchema.pre('save', function(next) {

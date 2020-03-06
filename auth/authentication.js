@@ -19,9 +19,9 @@ function aut(req, res, next) {
 }
 
 function checkauth(req, res, next) {
-    let token = req.role;
-    console.log('>>>>>>>>>>>>>>>>>>>>>>>:'+token);
-    if (token=='admin') {
+    let role = req.role;
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>:' + role);
+    if (role == 'admin') {
         next()
     } else {
         res.render('auth.html');
