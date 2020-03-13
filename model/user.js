@@ -12,7 +12,8 @@ const UserSchema = new Schema({
            
         },
     is_deleted:{type:Boolean,default:false},
-    resetCheck:String    
+    resetCheck:String,
+    profilepic:String    
 });
 
 UserSchema.pre('save', function(next) {

@@ -4,6 +4,16 @@ const nodemailer = require("nodemailer");
 const jwt = require('jsonwebtoken');
 var path = require('path');
 const formidable = require('formidable');
+const cloudinary = require('cloudinary');
+// const alert = require('alert');
+
+cloudinary.config({
+    cloud_name: 'dfexez4st',
+    api_key: '958711819877618',
+    api_secret: 'FD1sBAYXdwSOmXwddLxFJmxwKdg'
+});
+
+
 SALT_WORK_FACTOR = 10;
 
 module.exports = {
@@ -28,7 +38,7 @@ module.exports = {
     subadminchange,
     subadminpass,
     adminchangepass,
-    resetpass,saveresetpass,submitresetpass,uploadpage,imgupload
+    resetpass, saveresetpass, submitresetpass, uploadpage, imgupload
 }
 
 
@@ -58,7 +68,10 @@ function adminRegister_save(req, res) {
 }
 
 function login(req, res) {
-    res.render('index.html');
+    let profilepic = req.pro;
+    let name = req.name;
+    console.log(">>>>>>>>>>>>>>>>",profilepic);
+    res.render('index.html',{profilepic,name});
 }
 
 function adminLogin(req, res) {
@@ -85,7 +98,7 @@ function adminLogin(req, res) {
                         } else {
                             let token = tokenGenerate(data.id, data.role);
 
-                            res.cookie('name', token).render('index.html')
+                            res.cookie('name', token).redirect('/')
 
                         }
                     }
@@ -128,7 +141,7 @@ function user_save(req, res) {
             res.json(err);
         } else {
             sendmail(email, password)
-            res.render('index.html');
+            res.redirect('/')
         }
 
     })
@@ -158,7 +171,7 @@ function subadmin_save(req, res) {
             console.log(err);
         } else {
             sendmail(email, password)
-            res.render('index.html');
+            res.redirect('/')
 
         }
     })
@@ -286,33 +299,33 @@ function forgot(req, res, next) {
     let password = generator.generate({
         length: 10
     })
-            req.pass = password;
-            next()
+    req.pass = password;
+    next()
 }
 function forgotpass(req, res) {
     let email = req.body.email;
     let newpass = req.pass;
     console.log(email);
-    userSchema.findOne({ 'email': email }, (err,result) => {
+    userSchema.findOne({ 'email': email }, (err, result) => {
         console.log(result);
         let role = result.role;
         console.log(role);
         if (err) {
             console.log(err);
         }
-         else if(role == 'admin' || role =='user') {
-             result.password=newpass;
-             sendmail(email, newpass);
-             result.save((err)=>{
-                 if(err){
-                     console.log(err);
-                 }
-                 else{
-                    
+        else if (role == 'admin' || role == 'user') {
+            result.password = newpass;
+            sendmail(email, newpass);
+            result.save((err) => {
+                if (err) {
+                    console.log(err);
+                }
+                else {
+
                     res.render('login.html');
-                 }
-             })
-        }else{
+                }
+            })
+        } else {
             res.render('auth.html');
         }
     })
@@ -339,7 +352,7 @@ function changepass(req, res) {
 
 
 function adminchangepass(req, res) {
-    
+
     let email = req.body.email;
     console.log(email);
     let oldpass = req.body.oldpass;
@@ -349,27 +362,27 @@ function adminchangepass(req, res) {
     let newpass = req.body.newpass;
     console.log(newpass);
 
-    userSchema.findOne({'email':email},function(err,result){
-        if(err){
+    userSchema.findOne({ 'email': email }, function (err, result) {
+        if (err) {
             console.log(err)
         }
-        else{
-            result.comparePassword(oldpass,function(err,isMatch){
-                if(err){
+        else {
+            result.comparePassword(oldpass, function (err, isMatch) {
+                if (err) {
                     console.log(err)
                 }
-               else if(isMatch){
-                    result.password=newpass;
-                    result.save(function(err){
-                        if(err){
+                else if (isMatch) {
+                    result.password = newpass;
+                    result.save(function (err) {
+                        if (err) {
                             console.log(err)
                         }
-                        else{
+                        else {
                             res.redirect('/')
                         }
                     })
                 }
-                else{
+                else {
                     res.json("Wrong Old Password")
                 }
             })
@@ -377,26 +390,26 @@ function adminchangepass(req, res) {
     })
 }
 
-function subadminchange(req, res,) {
-    let id=req.params.id;
-    res.render('subadminpass.html',{id})
+function subadminchange(req, res, ) {
+    let id = req.params.id;
+    res.render('subadminpass.html', { id })
 }
 
 
 
-function subadminpass(req,res){
+function subadminpass(req, res) {
     let id = req.body.id;
     let pass = req.body.newpass;
-    console.log("find",id,pass)
-    userSchema.findOne({'_id':id},(err,data)=>{
-        if(err){
+    console.log("find", id, pass)
+    userSchema.findOne({ '_id': id }, (err, data) => {
+        if (err) {
             console.log(err);
-        }else {
-            data.password=pass;
-            data.save(function(err){
-                if(err){
+        } else {
+            data.password = pass;
+            data.save(function (err) {
+                if (err) {
                     console.log(err);
-                }else{
+                } else {
                     res.redirect('/')
                 }
             })
@@ -404,52 +417,52 @@ function subadminpass(req,res){
     })
 }
 
-function resetpass(req, res){
+function resetpass(req, res) {
     let email = req.body.email;
     console.log(email);
 
-    userSchema.findOne({'email':email},(err,result)=>{
-        if(err){
+    userSchema.findOne({ 'email': email }, (err, result) => {
+        if (err) {
             console.log(err);
         }
-        else if(result == null){
+        else if (result == null) {
             res.json("please enter register email");
 
         }
-        else if(result.role == 'subadmin'){
+        else if (result.role == 'subadmin') {
             res.json('request admin to change the password');
-        }else{
-            let id= result.id;
-            let role="resetpass";
-            jwt.sign({ 'id': id, 'role': role }, "chandra", { expiresIn: '60m' },function(err,token){
-                if(err){}
-                else{
-                    var mailOptions={
-                        from : 'munjal.chirag.test@gmail.com',
-                        to : email,
-                        subject : 'register',
-                        html :'<p>Click <a href = "https://sdirect-chandra.herokuapp.com/recover/'+token+'">clickhear</a>to reset your password </p>'
+        } else {
+            let id = result.id;
+            let role = "resetpass";
+            jwt.sign({ 'id': id, 'role': role }, "chandra", { expiresIn: '60m' }, function (err, token) {
+                if (err) { }
+                else {
+                    var mailOptions = {
+                        from: 'munjal.chirag.test@gmail.com',
+                        to: email,
+                        subject: 'register',
+                        html: '<p>Click <a href = "https://sdirect-chandra.herokuapp.com/recover/' + token + '">clickhear</a>to reset your password </p>'
 
                     }
-                    transporter.sendMail(mailOptions,function(err,info){
-                            if(err){
-                                res.json("Internal Error")
-                            }
-                            else{
-                                result.resetCheck=token;
-                                result.save((err)=>{
-                                    if(err){
-                                        res.json("Error")
-                                    }
-                                    else{
-                                        res.redirect('/');
-                                    }
-                                })
-                            }
+                    transporter.sendMail(mailOptions, function (err, info) {
+                        if (err) {
+                            res.json("Internal Error")
+                        }
+                        else {
+                            result.resetCheck = token;
+                            result.save((err) => {
+                                if (err) {
+                                    res.json("Error")
+                                }
+                                else {
+                                    res.redirect('/');
+                                }
+                            })
+                        }
                     })
                 }
             });
-            
+
         }
     })
 }
@@ -459,34 +472,34 @@ function resetpass(req, res){
 
 
 
-function saveresetpass(req,res){
-    let token=req.params.id;
-    jwt.verify(token,"chandra",(err,decode)=>{
-        if(err){
+function saveresetpass(req, res) {
+    let token = req.params.id;
+    jwt.verify(token, "chandra", (err, decode) => {
+        if (err) {
             res.json("Invalid Token");
         }
-        else{
-            let id =decode.id;
-            let role=decode.role;
-            
-            if(role == 'resetpass'){
-                    
-                    userSchema.findOne({'_id':id,'resetCheck':token},(err,data)=>{
-                        if(err){
-                            res.json("Error")
-                        }
-                        else if(data == null){
-                            res.redirect('/')
+        else {
+            let id = decode.id;
+            let role = decode.role;
 
-                        }
-                        else{
-                            let email=data.email;
-                            res.render('resetpass.html',{id,email,token});
-                        }
+            if (role == 'resetpass') {
 
-                    })
+                userSchema.findOne({ '_id': id, 'resetCheck': token }, (err, data) => {
+                    if (err) {
+                        res.json("Error")
+                    }
+                    else if (data == null) {
+                        res.redirect('/')
+
+                    }
+                    else {
+                        let email = data.email;
+                        res.render('resetpass.html', { id, email, token });
+                    }
+
+                })
             }
-            else{
+            else {
                 res.json("Invalid")
             }
         }
@@ -494,19 +507,19 @@ function saveresetpass(req,res){
 }
 
 
-function submitresetpass(req,res){
-    let id=req.body.id;
-    let pass=req.body.password;
-    let token=req.body.token;
-    userSchema.findOne({'_id':id},function(err,user){
-        if(err){}
-        else if(user == null){}
-        else{
-            user.password=pass;
-            user.resetLink=undefined;
-            user.save((err)=>{
-                if(err){}
-                else{
+function submitresetpass(req, res) {
+    let id = req.body.id;
+    let pass = req.body.password;
+    let token = req.body.token;
+    userSchema.findOne({ '_id': id }, function (err, user) {
+        if (err) { }
+        else if (user == null) { }
+        else {
+            user.password = pass;
+            user.resetLink = undefined;
+            user.save((err) => {
+                if (err) { }
+                else {
                     res.redirect('/');
                 }
             })
@@ -516,23 +529,53 @@ function submitresetpass(req,res){
 
 
 
-function uploadpage (req, res){
-    res.render( 'uploadimg.html');
+function uploadpage(req, res) {
+    res.render('uploadimg.html');
 };
 
-function imgupload(req, res){
+function imgupload(req, res) {
     var form = new formidable.IncomingForm();
 
     form.parse(req);
 
-    form.on('fileBegin', function (name, file){
+    form.on('fileBegin', function (name, file) {
         file.path = path.join(__dirname, '../public/img/') + file.name;
         console.log(path.join(__dirname, '../public/img/'));
     });
 
-    form.on('file', function (name, file){
-        console.log('Uploaded ' + file.name);
-    });
+    form.on('file', function (name, file) {
+        cloudinary.v2.uploader.upload(file.path, function (error, result) {
+            if (error) {
+                console.log("Error", error);
+            }
+            else
+                console.log("Result", result);
+            console.log('iddddddddddddddddddddddddddd' + req.id);
+            userSchema.findOne({ '_id': req.id }, (err, data) => {
+                if (err) {
+                    console.log(err);
+                 }
+                else if (data == null) {
+                   alert("error");
+                 }
+                else {
+                    console.log(data);
+                    data.profilepic = result.url;
+                    data.save((err) => {
+                        if (err) {
+                            console.log(err);
+                        }
+                        else {
 
-    res.render('index.html');
+                            res.redirect('/');
+                        }
+                    })
+
+                }
+            })
+
+        });
+
+
+    });
 };
